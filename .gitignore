@@ -1,0 +1,16 @@
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Python cache and virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# Local AWS configuration/secrets (Never upload secrets to GitHub!)
+.env
+.aws/
+.aws-sam/
