@@ -20,12 +20,6 @@ def lambda_handler(event, context):
 
     return {
         'statusCode': 200,
-        # This CORS header is crucial so your HTML page is allowed to read this data
-        'headers': {
-            'Access-Control-Allow-Origin': '*', 
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
-        },
         'body': json.dumps({'number': int(new_count)})
     }
     
