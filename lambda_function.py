@@ -1,4 +1,4 @@
-_import json
+import json
 import boto3
 
 # Instantiate 
@@ -20,6 +20,9 @@ def lambda_handler(event, context):
 
     return {
         'statusCode': 200,
+        'headers': {
+            'Content-Type': 'application/json',
+        },
         'body': json.dumps({'number': int(new_count)})
     }
     
