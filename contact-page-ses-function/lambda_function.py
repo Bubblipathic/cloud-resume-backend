@@ -15,7 +15,8 @@ def lambda_handler(event, context):
         message = body.get('message')
 
         # 2. Format the email content
-        # Note: In SES Sandbox, the Source MUST be your verified Gmail.
+        # Send FROM your verified custom domain (This uses your DKIM/SPF records!)
+        from_email = "noreply@jaymart-reario.abrdns.com"
         # We put the visitor's email in the Reply-To field so you can hit "Reply" in Gmail.
         my_email = "jaymartreario@gmail.com" # Replace with your verified SES email
         
@@ -32,7 +33,7 @@ def lambda_handler(event, context):
 
         # 3. Send the email via SES
         response = ses.send_email(
-            Source=my_email,
+            Source=from_email,
             Destination={
                 'ToAddresses': [my_email]
             },
@@ -40,7 +41,7 @@ def lambda_handler(event, context):
                 'Subject': {'Data': f"Portfolio Contact: {subject}"},
                 'Body': {'Text': {'Data': email_body}}
             },
-            ReplyToAddresses=[sender_email]
+            ReplyToAddresses=[sender_email] if sender_email else []
         )
 
         # 4. Return success to the frontend
@@ -50,11 +51,20 @@ def lambda_handler(event, context):
         }
 
     except ClientError as e:
-        print(e.response['Error']['Message'])
+        error_code = e.response['Error']['Code']
+        
+        # Catch the specific 200-limit error
+        if error_code == 'LimitExceededException' or error_code == 'Throttling':
+            return {
+                'statusCode': 429,
+                'body': json.dumps({'error': 'Daily message limit reached. Please try again tomorrow!'})
+            }
+            
         return {
             'statusCode': 500,
             'body': json.dumps({'error': 'Failed to send email via SES'})
         }
+
     except Exception as e:
         return {
             'statusCode': 400,
